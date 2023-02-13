@@ -16,7 +16,7 @@ public class AudioReceiver {
         Properties prop = Config.get();
 
         // Port to receive on
-        int port = Integer.getInteger(prop.getProperty("port"));
+        int port = Integer.parseInt(prop.getProperty("port"));
 
         // Open socket
         try {

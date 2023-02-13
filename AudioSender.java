@@ -18,7 +18,7 @@ public class AudioSender {
         Properties prop = Config.get();
 
         // Port to send to
-        int port = Integer.getInteger(prop.getProperty("port"));
+        int port = Integer.parseInt(prop.getProperty("port"));
         // IP address to send to
         try {
             clientIP = InetAddress.getByName(prop.getProperty("clientIP"));
