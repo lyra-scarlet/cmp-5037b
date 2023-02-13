@@ -23,7 +23,7 @@ public class AudioSender
       InetAddress clientIP = null;
       try
       {
-         clientIP = InetAddress.getByName("139.222.98.218");
+         clientIP = InetAddress.getByName("localhost");
       }
       catch (UnknownHostException e)
       {
