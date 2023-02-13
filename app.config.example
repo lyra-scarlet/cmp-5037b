@@ -1,0 +1,5 @@
+# IP address (string) to send packets to
+clientIP=localhost
+
+# Port (int) used for both sending and receiving packets
+port=55555
