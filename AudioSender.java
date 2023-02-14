@@ -12,8 +12,7 @@ public class AudioSender {
     static InetAddress clientIP;
     static AudioRecorder recorder;
 
-       public static void main(String args[]) throws Exception
-    {
+    public static void main(String[] args) throws Exception {
         // Get config
         Properties prop = Config.get();
 

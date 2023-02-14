@@ -11,7 +11,7 @@ public class AudioReceiver {
     static DatagramSocket receiving_socket;
     static AudioPlayer player;
 
-    public static void main (String[] args) throws Exception{
+    public static void main(String[] args) throws Exception {
         // Get config
         Properties prop = Config.get();
 
