@@ -3,3 +3,9 @@ clientIP=localhost
 
 # Port (int) used for both sending and receiving packets
 port=55555
+
+# Datagram socket to use
+socket=1
+
+# Packet timeout in ms
+timeout=50

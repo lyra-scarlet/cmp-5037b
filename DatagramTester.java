@@ -53,13 +53,12 @@ public class DatagramTester {
     }
 
     public static void main(String args[]) throws Exception {
-        // Testing definitions
-        int timeout = 50; // ms to wait for timeout
-        int packets = 500; // amount of packets to send
-        int socket = 3; // number of socket to test (1 to 4)
-
         // Get config
         Properties prop = Config.get();
+        // Testing definitions
+        int timeout = Integer.parseInt(prop.getProperty("timeout"));
+        int socket = Integer.parseInt(prop.getProperty("socket"));
+        int packets = 500; // amount of packets to send
         int port = Integer.parseInt(prop.getProperty("port"));
         // Set static variables and also set packet timeout
         DatagramTester.setClientIP();
