@@ -1,12 +1,15 @@
+import java.net.*;
+import java.io.*;
+import java.util.Properties;
 import CMPC3M06.AudioRecorder;
 
 import javax.sound.sampled.LineUnavailableException;
-import java.net.*;
-import java.io.*;
 
 public class VoiceSenderThread implements Runnable{
 
    static DatagramSocket sending_socket;
+   static InetAddress clientIP;
+   static AudioRecorder recorder;
 
    public void start()
    {
@@ -15,76 +18,51 @@ public class VoiceSenderThread implements Runnable{
       thread.start();
    }
 
-   public void run (){
+   public void run () {
+      // Get config
+      Properties prop = Config.get();
 
-      //***************************************************
-      //Port to send to
-      int PORT = 55555;
-      //IP ADDRESS to send to
-      InetAddress clientIP = null;
+      // Port to send to
+      int port = Integer.parseInt(prop.getProperty("port"));
+      // IP address to send to
       try {
-         clientIP = InetAddress.getByName("localhost");  //CHANGE localhost to IP or NAME of client machine
+         clientIP = InetAddress.getByName(prop.getProperty("clientIP"));
       } catch (UnknownHostException e) {
-         System.out.println("ERROR: TextSender: Could not find client IP");
+         System.out.println("ERROR: AudioSender: Could not find client IP");
          e.printStackTrace();
          System.exit(0);
       }
-      //***************************************************
 
-      //***************************************************
-      //Open a socket to send from
-      //We dont need to know its port number as we never send anything to it.
-      //We need the try and catch block to make sure no errors occur.
-
-      //DatagramSocket sending_socket;
-      try{
+      // Open socket
+      try {
          sending_socket = new DatagramSocket();
-      } catch (SocketException e){
-         System.out.println("ERROR: TextSender: Could not open UDP socket to send from.");
+      } catch (SocketException e) {
+         System.out.println("ERROR: AudioSender: Could not open UDP socket to send from.");
          e.printStackTrace();
          System.exit(0);
       }
-      //***************************************************
 
-      //***************************************************
-      //Main loop.
-
-      AudioRecorder recorder = null;
-      try
-      {
+      // Main loop
+      try {
          recorder = new AudioRecorder();
+      } catch (LineUnavailableException e) {
+         throw new RuntimeException(e);
       }
-      catch (LineUnavailableException e)
-      {
+      System.out.println("Sending audio...");
+      while (true) try {
+         // Get a block from recorder
+         byte[] block = recorder.getBlock();
+         // Make a DatagramPacket from it, with client address and port number, then send it
+         DatagramPacket packet = new DatagramPacket(block, block.length, clientIP, port);
+         sending_socket.send(packet);
+         //System.out.println("Sent packet");
+      } catch (IOException e) {
+         System.out.println("ERROR: AudioSender: IO error occurred!");
          e.printStackTrace();
+         break;
       }
 
-      boolean running = true;
-      int i = 0;
-      while (running)
-      {
-         {
-            try
-            {
-               byte[] block = recorder.getBlock();
-               //Make a DatagramPacket from it, with client address and port number
-               DatagramPacket packet = new DatagramPacket(block, block.length, clientIP, PORT);
-               //Send it
-               sending_socket.send(packet);
-               //System.out.println("Sent packet");
-               i++;
-               System.out.println("Sending Packet " + i);
-
-            }
-            catch (IOException e)
-            {
-               System.out.println("ERROR: TextSender: Some random IO error occured!");
-               e.printStackTrace();
-            }
-         }
-      }
       //Close the socket
       sending_socket.close();
-      //***************************************************
    }
 }
