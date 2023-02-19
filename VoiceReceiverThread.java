@@ -3,6 +3,8 @@ import CMPC3M06.AudioPlayer;
 import javax.sound.sampled.LineUnavailableException;
 import java.net.*;
 import java.io.*;
+import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.Properties;
 
 public class VoiceReceiverThread implements Runnable
@@ -40,16 +42,22 @@ public class VoiceReceiverThread implements Runnable
          throw new RuntimeException(e);
       }
       System.out.println("Receiving audio...");
+      int sequence_num = 0;
       while (true) try {
          // Receive a DatagramPacket
-         byte[] buffer = new byte[512];
-         DatagramPacket packet = new DatagramPacket(buffer, 0, 512);
+         // **********************************************************************************
+         byte[] buffer = new byte[520];
+         DatagramPacket packet = new DatagramPacket(buffer, 0, 520);
 
          receiving_socket.receive(packet);
 
          // Play data from the byte buffer
-         player.playBlock(buffer);
-         // System.out.println("Packet received");
+         byte[] byte_seq_num = Arrays.copyOfRange(buffer, 0, 8);
+         byte[] block = Arrays.copyOfRange(buffer, 8, 520);
+         sequence_num = ByteBuffer.wrap(byte_seq_num).getInt();
+         System.out.println("Received Packet: " + sequence_num);
+         player.playBlock(block);
+         // **********************************************************************************
       } catch (IOException e) {
          System.out.println("ERROR: AudioReceiver: IO error occurred!");
          e.printStackTrace();

@@ -1,5 +1,6 @@
 import java.net.*;
 import java.io.*;
+import java.nio.ByteBuffer;
 import java.util.Properties;
 import CMPC3M06.AudioRecorder;
 
@@ -49,11 +50,25 @@ public class VoiceSenderThread implements Runnable{
          throw new RuntimeException(e);
       }
       System.out.println("Sending audio...");
+
+      // Sequence Numbering
+      // **********************************************************************************
+      int sequence_num = 0;
       while (true) try {
          // Get a block from recorder
          byte[] block = recorder.getBlock();
+         // Convert the current sequence number into a byte array of size 8 and increment sequence number.
+         byte[] byte_seq_num = ByteBuffer.allocate(8).putInt(sequence_num++).array();
+         // Create the payload of size 520 in the format: [sequence number (8 bytes), and audio block (512 bytes)]
+         byte[] payload = new byte[byte_seq_num.length + block.length];
+         ByteBuffer buffer = ByteBuffer.wrap(payload);
+         buffer.put(byte_seq_num);
+         buffer.put(block);
+         payload = buffer.array();
+
          // Make a DatagramPacket from it, with client address and port number, then send it
-         DatagramPacket packet = new DatagramPacket(block, block.length, clientIP, port);
+         DatagramPacket packet = new DatagramPacket(payload, payload.length, clientIP, port);
+         // **********************************************************************************
          sending_socket.send(packet);
          //System.out.println("Sent packet");
       } catch (IOException e) {
