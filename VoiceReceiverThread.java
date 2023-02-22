@@ -67,9 +67,6 @@ public class VoiceReceiverThread implements Runnable
          // **********************************************************************************
       } catch (IOException e) {
          if (e instanceof SocketTimeoutException) {
-            System.err.println("Packet Lost");
-            for (int j = 0; j < block.length; j++)
-               block[j] *= 0.5;
             try
             {
                player.playBlock(block);
@@ -78,6 +75,8 @@ public class VoiceReceiverThread implements Runnable
             {
                ex.printStackTrace();
             }
+            for (int j = 0; j < block.length; j++)
+               block[j] *= 0.8;
             continue;
          }
          System.out.println("ERROR: AudioReceiver: IO error occurred!");
