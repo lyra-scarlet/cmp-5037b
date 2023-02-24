@@ -3,8 +3,7 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.util.Properties;
 import CMPC3M06.AudioRecorder;
-import uk.ac.uea.cmp.voip.DatagramSocket2;
-
+import uk.ac.uea.cmp.voip.*;
 import javax.sound.sampled.LineUnavailableException;
 
 public class VoiceSenderThread implements Runnable{
@@ -26,6 +25,7 @@ public class VoiceSenderThread implements Runnable{
 
       // Port to send to
       int port = Integer.parseInt(prop.getProperty("port"));
+      int socket = Integer.parseInt(prop.getProperty("socket"));
       // IP address to send to
       try {
          clientIP = InetAddress.getByName(prop.getProperty("clientIP"));
@@ -37,9 +37,13 @@ public class VoiceSenderThread implements Runnable{
 
       // Open socket
       try {
-         // --------------------------------------
-         sending_socket = new DatagramSocket2();
-         // --------------------------------------
+         switch (socket) {
+            case 1 -> sending_socket = new DatagramSocket(port);
+            case 2 -> sending_socket = new DatagramSocket2(port);
+            case 3 -> sending_socket = new DatagramSocket3(port);
+            case 4 -> sending_socket = new DatagramSocket4(port);
+            default -> throw new SocketException(socket + " is not a valid socket number");
+         }
       } catch (SocketException e) {
          System.out.println("ERROR: AudioSender: Could not open UDP socket to send from.");
          e.printStackTrace();

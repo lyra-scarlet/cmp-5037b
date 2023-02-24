@@ -28,21 +28,22 @@ public class DatagramTester {
         // Open sockets
         try {
             switch (socket) {
-                case 1:     sending_socket = new DatagramSocket();
-                            receiving_socket = new DatagramSocket(port);
-                            break;
-                case 2:     sending_socket = new DatagramSocket2();
-                            receiving_socket = new DatagramSocket2(port);
-                            break;
-                case 3:     sending_socket = new DatagramSocket3();
-                            receiving_socket = new DatagramSocket3(port);
-                            break;
-                case 4:     sending_socket = new DatagramSocket4();
-                            receiving_socket = new DatagramSocket4(port);
-                            break;
-                default:    System.out.println(socket+" is not a valid socket number");
-                            System.exit(0);
-
+                case 1 -> {
+                    sending_socket = new DatagramSocket();
+                    receiving_socket = new DatagramSocket(port);
+                } case 2 -> {
+                    sending_socket = new DatagramSocket2();
+                    receiving_socket = new DatagramSocket2(port);
+                } case 3 -> {
+                    sending_socket = new DatagramSocket3();
+                    receiving_socket = new DatagramSocket3(port);
+                } case 4 -> {
+                    sending_socket = new DatagramSocket4();
+                    receiving_socket = new DatagramSocket4(port);
+                } default -> {
+                    System.out.println(socket + " is not a valid socket number");
+                    System.exit(0);
+                }
             }
         } catch (SocketException e) {
             System.out.println("Couldn't open sockets!");
@@ -51,7 +52,7 @@ public class DatagramTester {
         }
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
         // Get config
         Properties prop = Config.get();
         // Testing definitions
@@ -65,10 +66,10 @@ public class DatagramTester {
         receiving_socket.setSoTimeout(timeout);
         double loss = 0;
         double accuracy = 0;
-        double burstgap = 1;
-        double burstlength = 0;
-        double avgburstlength = 0;
-        double avgburstgap = 0;
+        double burstGap = 1;
+        double burstLength = 0;
+        double avgBurstLength = 0;
+        double avgBurstGap = 0;
         int bursts = 0;
         // Main loop
         for (int i = 0; i < packets; i++) {
@@ -91,22 +92,22 @@ public class DatagramTester {
                 correctness = correctness / 512 * 100;
                 System.out.println("Packet "+i+" has a correctness of "+correctness+"%");
                 if (correctness >= 100) accuracy++;
-                if (burstlength > 0) {
-                    avgburstlength *= bursts-1;
-                    avgburstlength = (avgburstlength+burstlength)/bursts;
-                    burstlength = 0;
+                if (burstLength > 0) {
+                    avgBurstLength *= bursts-1;
+                    avgBurstLength = (avgBurstLength+burstLength)/bursts;
+                    burstLength = 0;
                 }
-                burstgap++;
+                burstGap++;
             } catch (SocketTimeoutException e) {
                 loss++;
                 System.out.println("Packet "+i+" not received with a timeout of "+timeout+"ms");
-                if (burstgap > 0) {
-                    avgburstgap *= bursts;
+                if (burstGap > 0) {
+                    avgBurstGap *= bursts;
                     bursts++;
-                    avgburstgap = (avgburstgap+burstgap)/bursts;
-                    burstgap = 0;
+                    avgBurstGap = (avgBurstGap+burstGap)/bursts;
+                    burstGap = 0;
                 }
-                burstlength++;
+                burstLength++;
             }
         }
         // Calculate packet loss and accuracy
@@ -117,8 +118,8 @@ public class DatagramTester {
         System.out.println("Percentage of packets lost: "+loss+"%");
         if (bursts > 0) {
             System.out.println("Number of bursts: "+bursts);
-            System.out.println("Average burst length: " + avgburstlength);
-            System.out.println("Average burst gap: " + avgburstgap);
+            System.out.println("Average burst length: " + avgBurstLength);
+            System.out.println("Average burst gap: " + avgBurstGap);
         }
     }
 }
