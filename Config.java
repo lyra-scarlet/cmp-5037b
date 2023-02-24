@@ -8,11 +8,11 @@ import java.util.Properties;
 public class Config {
     private static FileInputStream stream;
     private static Properties prop = new Properties();
-
     static {
         try {
             stream = new FileInputStream("app.config");
-        } catch (FileNotFoundException e) {
+            prop.load(stream);
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
@@ -25,7 +25,11 @@ public class Config {
         return prop.getProperty(property);
     }
 
-    public static Integer getInt(String property) {
+    public static int getInt(String property) {
         return Integer.parseInt(prop.getProperty(property));
+    }
+
+    public static long getLong(String property) {
+        return Long.parseLong(prop.getProperty(property));
     }
 }
