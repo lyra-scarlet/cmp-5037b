@@ -9,3 +9,6 @@ socket=1
 
 # Packet timeout in ms
 timeout=50
+
+# Encryption key (64 bit int)
+key=53669617439937964248

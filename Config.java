@@ -6,14 +6,26 @@ import java.io.*;
 import java.util.Properties;
 
 public class Config {
-    public static Properties get() {
-        Properties prop = new Properties();
-        String fileName = "app.config";
-        try (FileInputStream stream = new FileInputStream(fileName)) {
-            prop.load(stream);
-        } catch (Exception ex) {
-            // Caught, but unhandled - might be worth handling later
+    private static FileInputStream stream;
+    private static Properties prop = new Properties();
+
+    static {
+        try {
+            stream = new FileInputStream("app.config");
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
         }
+    }
+
+    public static Properties get() {
         return prop;
+    }
+
+    public static String getString(String property) {
+        return prop.getProperty(property);
+    }
+
+    public static Integer getInt(String property) {
+        return Integer.parseInt(prop.getProperty(property));
     }
 }

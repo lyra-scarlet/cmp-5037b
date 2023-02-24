@@ -4,7 +4,6 @@
 
 import java.net.*;
 import java.util.Arrays;
-import java.util.Properties;
 import java.util.Random;
 import uk.ac.uea.cmp.voip.*;
 
@@ -53,13 +52,11 @@ public class DatagramTester {
     }
 
     public static void main(String[] args) throws Exception {
-        // Get config
-        Properties prop = Config.get();
         // Testing definitions
-        int timeout = Integer.parseInt(prop.getProperty("timeout"));
-        int socket = Integer.parseInt(prop.getProperty("socket"));
+        int timeout = Config.getInt("timeout");
+        int socket = Config.getInt("socket");
+        int port = Config.getInt("port");
         int packets = 500; // amount of packets to send
-        int port = Integer.parseInt(prop.getProperty("port"));
         // Set static variables and also set packet timeout
         DatagramTester.setClientIP();
         DatagramTester.setSockets(port,socket);

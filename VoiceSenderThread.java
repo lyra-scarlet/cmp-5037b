@@ -20,22 +20,18 @@ public class VoiceSenderThread implements Runnable{
    }
 
    public void run () {
-      // Get config
-      Properties prop = Config.get();
-
       // Port to send to
-      int port = Integer.parseInt(prop.getProperty("port"));
-      int socket = Integer.parseInt(prop.getProperty("socket"));
+      int port = Config.getInt("port");
       // IP address to send to
       try {
-         clientIP = InetAddress.getByName(prop.getProperty("clientIP"));
+         clientIP = InetAddress.getByName(Config.getString("clientIP"));
       } catch (UnknownHostException e) {
          System.out.println("ERROR: AudioSender: Could not find client IP");
          e.printStackTrace();
          System.exit(0);
       }
-
       // Open socket
+      int socket = Config.getInt("socket");
       try {
          switch (socket) {
             case 1 -> sending_socket = new DatagramSocket(port);

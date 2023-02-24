@@ -23,14 +23,10 @@ public class VoiceReceiverThread implements Runnable
 
    public void run()
    {
-      // Get config
-      Properties prop = Config.get();
-
       // Port to receive on
-      int port = Integer.parseInt(prop.getProperty("port"));
-      int socket = Integer.parseInt(prop.getProperty("socket"));
-
+      int port = Config.getInt("port");
       // Open socket
+      int socket = Config.getInt("socket");
       try {
          switch (socket) {
             case 1 -> receiving_socket = new DatagramSocket(port);
