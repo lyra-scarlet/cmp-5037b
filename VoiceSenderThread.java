@@ -1,10 +1,8 @@
 import java.net.*;
 import java.io.*;
 import java.nio.ByteBuffer;
-import java.util.Properties;
 import CMPC3M06.AudioRecorder;
-import uk.ac.uea.cmp.voip.DatagramSocket2;
-
+import uk.ac.uea.cmp.voip.*;
 import javax.sound.sampled.LineUnavailableException;
 
 public class VoiceSenderThread implements Runnable{
@@ -21,25 +19,26 @@ public class VoiceSenderThread implements Runnable{
    }
 
    public void run () {
-      // Get config
-      Properties prop = Config.get();
-
       // Port to send to
-      int port = Integer.parseInt(prop.getProperty("port"));
+      int port = Config.getInt("port");
       // IP address to send to
       try {
-         clientIP = InetAddress.getByName(prop.getProperty("clientIP"));
+         clientIP = InetAddress.getByName(Config.getString("clientIP"));
       } catch (UnknownHostException e) {
          System.out.println("ERROR: AudioSender: Could not find client IP");
          e.printStackTrace();
          System.exit(0);
       }
-
       // Open socket
+      int socket = Config.getInt("socket");
       try {
-         // --------------------------------------
-         sending_socket = new DatagramSocket2();
-         // --------------------------------------
+         switch (socket) {
+            case 1 -> sending_socket = new DatagramSocket();
+            case 2 -> sending_socket = new DatagramSocket2();
+            case 3 -> sending_socket = new DatagramSocket3();
+            case 4 -> sending_socket = new DatagramSocket4();
+            default -> throw new SocketException(socket + " is not a valid socket number");
+         }
       } catch (SocketException e) {
          System.out.println("ERROR: AudioSender: Could not open UDP socket to send from.");
          e.printStackTrace();
