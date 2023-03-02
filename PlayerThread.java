@@ -2,8 +2,12 @@ import CMPC3M06.AudioPlayer;
 
 import javax.sound.sampled.LineUnavailableException;
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.Queue;
 
-public class PlayerThread implements Runnable
+import static java.lang.Thread.sleep;
+
+public class PlayerThread extends Thread
 {
    static byte[] block = new byte[512];
    static AudioPlayer player;
@@ -20,6 +24,13 @@ public class PlayerThread implements Runnable
       }
    }
 
+   static Queue<byte[]> sharedQueue = new LinkedList<>();
+
+   public PlayerThread(Queue<byte[]> myQueue)
+   {
+      sharedQueue = myQueue;
+   }
+
    public void setBlock(byte[] newBlock)
    {
       block = newBlock;
@@ -33,15 +44,21 @@ public class PlayerThread implements Runnable
 
    public void run()
    {
-      while (true)
+      synchronized (sharedQueue)
       {
-         try
+         while (!sharedQueue.isEmpty())
          {
-            player.playBlock(block);
-         }
-         catch (IOException e)
-         {
-            e.printStackTrace();
+            byte[] block = sharedQueue.poll();
+            setBlock(block);
+            try
+            {
+               player.playBlock(block);
+               sharedQueue.wait();
+            }
+            catch (InterruptedException | IOException e)
+            {
+               e.printStackTrace();
+            }
          }
       }
    }
