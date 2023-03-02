@@ -11,6 +11,8 @@ public class VoiceReceiverThread implements Runnable
    static DatagramSocket receiving_socket;
    static AudioPlayer player;
    static byte[] block = new byte[512];
+   static PlayerThread playerThread = new PlayerThread();
+   static byte[] buffer = new byte[520];
 
    public void start()
    {
@@ -20,6 +22,7 @@ public class VoiceReceiverThread implements Runnable
 
    public void run()
    {
+      playerThread.start();
       // Port to receive on
       int port = Config.getInt("port");
       // Open socket
@@ -49,7 +52,6 @@ public class VoiceReceiverThread implements Runnable
       while (true) try {
          // Receive a DatagramPacket
          // **********************************************************************************
-         byte[] buffer = new byte[520];
          DatagramPacket packet = new DatagramPacket(buffer, 0, 520);
 
          receiving_socket.setSoTimeout(32);
@@ -65,16 +67,7 @@ public class VoiceReceiverThread implements Runnable
          // **********************************************************************************
       } catch (IOException e) {
          if (e instanceof SocketTimeoutException) {
-            try
-            {
-               player.playBlock(block);
-            }
-            catch (IOException ex)
-            {
-               ex.printStackTrace();
-            }
-            for (int j = 0; j < block.length; j++)
-               block[j] *= 0.8;
+            playerThread.setBlock(block);
             continue;
          }
          System.out.println("ERROR: AudioReceiver: IO error occurred!");
