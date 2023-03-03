@@ -64,6 +64,7 @@ public class VoiceReceiverThread implements Runnable
          System.out.println("Received Packet: " + sequence_num);
 //         long start = System.currentTimeMillis();
          player.playBlock(block);
+         playerThread.setBlock(block);
 //         long finish = System.currentTimeMillis();
 //         long timeElapsed = finish - start;
 //         System.out.println("timeElapsed in milliseconds (new block): " + timeElapsed);
