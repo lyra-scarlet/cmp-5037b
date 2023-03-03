@@ -36,7 +36,7 @@ public class PlayerThread implements Runnable
          try
          {
             player.playBlock(block);
-            Thread.sleep(32);
+            Thread.sleep(180, 2);
          }
          catch (IOException | InterruptedException e)
          {

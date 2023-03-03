@@ -61,8 +61,13 @@ public class VoiceReceiverThread implements Runnable
          byte[] byte_seq_num = Arrays.copyOfRange(buffer, 0, 8);
          byte[] block = Arrays.copyOfRange(buffer, 8, 520);
          sequence_num = ByteBuffer.wrap(byte_seq_num).getInt();
-         player.playBlock(block);
          System.out.println("Received Packet: " + sequence_num);
+//         long start = System.currentTimeMillis();
+         player.playBlock(block);
+//         long finish = System.currentTimeMillis();
+//         long timeElapsed = finish - start;
+//         System.out.println("timeElapsed in milliseconds (new block): " + timeElapsed);
+
 
          // **********************************************************************************
       } catch (IOException e) {
