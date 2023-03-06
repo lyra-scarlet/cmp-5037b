@@ -11,8 +11,6 @@ public class VoiceReceiverThread implements Runnable
    static DatagramSocket receiving_socket;
    static AudioPlayer player;
    static byte[] block = new byte[512];
-   static PlayerThread playerThread = new PlayerThread();
-   static byte[] buffer = new byte[520];
 
    public void start()
    {
@@ -22,7 +20,6 @@ public class VoiceReceiverThread implements Runnable
 
    public void run()
    {
-      playerThread.start();
       // Port to receive on
       int port = Config.getInt("port");
       // Open socket
@@ -48,40 +45,36 @@ public class VoiceReceiverThread implements Runnable
          throw new RuntimeException(e);
       }
       System.out.println("Receiving audio...");
-      long sequence_num;
+      int sequence_num;
       while (true) try {
          // Receive a DatagramPacket
          // **********************************************************************************
-         DatagramPacket packet = new DatagramPacket(buffer, 0, 524);
+         byte[] buffer = new byte[520];
+         DatagramPacket packet = new DatagramPacket(buffer, 0, 520);
 
          receiving_socket.setSoTimeout(32);
          receiving_socket.receive(packet);
 
-         // Get data from the byte buffer
+         // Play data from the byte buffer
          byte[] byte_seq_num = Arrays.copyOfRange(buffer, 0, 8);
-         byte[] new_block = Arrays.copyOfRange(buffer, 8, 520);
-         byte[] checksum = Arrays.copyOfRange(buffer, 520, buffer.length);
-         // Decrypt audio block
-         SecurityLayer.EncryptDecrypt(new_block);
-         // Check checksum
-         byte[] checksum_data = ByteBuffer.wrap(new byte[520]).put(byte_seq_num).put(new_block).array();
-         if (!Arrays.equals(checksum, SecurityLayer.CalcChecksum(checksum_data)))
-            throw new SocketTimeoutException("Checksum mismatch");
-         // Play block
-         block = new_block;
-         sequence_num = ByteBuffer.wrap(byte_seq_num).getLong();
+         byte[] block = Arrays.copyOfRange(buffer, 8, 520);
+         sequence_num = ByteBuffer.wrap(byte_seq_num).getInt();
+         player.playBlock(block);
          System.out.println("Received Packet: " + sequence_num);
-//         long start = System.currentTimeMillis();
-         playerThread.addToQueue(block);
-//         long finish = System.currentTimeMillis();
-//         long timeElapsed = finish - start;
-//         System.out.println("timeElapsed in milliseconds (new block): " + timeElapsed);
-
 
          // **********************************************************************************
       } catch (IOException e) {
          if (e instanceof SocketTimeoutException) {
-            playerThread.addToQueue(block);
+            try
+            {
+               player.playBlock(block);
+            }
+            catch (IOException ex)
+            {
+               ex.printStackTrace();
+            }
+            for (int j = 0; j < block.length; j++)
+               block[j] *= 0.8;
             continue;
          }
          System.out.println("ERROR: AudioReceiver: IO error occurred!");
