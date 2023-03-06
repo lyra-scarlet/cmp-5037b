@@ -59,6 +59,8 @@ public class VoiceSenderThread implements Runnable{
       while (true) try {
          // Get a block from recorder
          byte[] block = recorder.getBlock();
+         // Encrypt audio block
+         block = SecurityLayer.EncryptDecrypt(block);
          // Convert the current sequence number into a byte array of size 8 and increment sequence number.
          byte[] byte_seq_num = ByteBuffer.allocate(8).putInt(sequence_num++).array();
          // Create the payload of size 520 in the format: [sequence number (8 bytes), and audio block (512 bytes)]
