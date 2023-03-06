@@ -21,22 +21,24 @@ public class SecurityLayer {
     }
 
     public static byte[] CalcChecksum(byte[] data) {
-        int checksum = Integer.MIN_VALUE;
+        short checksum = 0;
         for (byte datum : data) {
-            checksum += datum;
+            checksum += Math.abs(datum) * 3;
         }
-        return ByteBuffer.allocate(Integer.BYTES).putInt(checksum).array();
+        return ByteBuffer.allocate(Short.BYTES).putShort(checksum).array();
     }
 
     public static void main (String[] args) {
         // Test harness
-        byte[] data = new byte[64];
+        byte[] data = new byte[512];
         new Random().nextBytes(data);
         System.out.println("Key:   "+HexFormat.of().formatHex(key));
         System.out.println("Original:   "+HexFormat.of().formatHex(data));
+        System.out.println("Original checksum: "+HexFormat.of().formatHex(CalcChecksum(data)));
         EncryptDecrypt(data);
         System.out.println("Encrypted:  "+HexFormat.of().formatHex(data));
         EncryptDecrypt(data);
         System.out.println("Decrypted:  "+HexFormat.of().formatHex(data));
+        System.out.println("Decrypted checksum: "+HexFormat.of().formatHex(CalcChecksum(data)));
     }
 }

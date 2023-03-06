@@ -60,7 +60,7 @@ public class VoiceReceiverThread implements Runnable
          // Get data from the byte buffer
          byte[] byte_seq_num = Arrays.copyOfRange(buffer, 0, 8);
          byte[] new_block = Arrays.copyOfRange(buffer, 8, 520);
-         byte[] checksum = Arrays.copyOfRange(buffer, 520, 524);
+         byte[] checksum = Arrays.copyOfRange(buffer, 520, buffer.length);
          // Decrypt audio block
          SecurityLayer.EncryptDecrypt(new_block);
          // Check checksum
