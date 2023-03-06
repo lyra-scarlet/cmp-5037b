@@ -72,8 +72,7 @@ public class VoiceReceiverThread implements Runnable
          sequence_num = ByteBuffer.wrap(byte_seq_num).getLong();
          System.out.println("Received Packet: " + sequence_num);
 //         long start = System.currentTimeMillis();
-         player.playBlock(block);
-         playerThread.setBlock(block);
+         playerThread.addToQueue(block);
 //         long finish = System.currentTimeMillis();
 //         long timeElapsed = finish - start;
 //         System.out.println("timeElapsed in milliseconds (new block): " + timeElapsed);
@@ -82,7 +81,7 @@ public class VoiceReceiverThread implements Runnable
          // **********************************************************************************
       } catch (IOException e) {
          if (e instanceof SocketTimeoutException) {
-            playerThread.setBlock(block);
+            playerThread.addToQueue(block);
             continue;
          }
          System.out.println("ERROR: AudioReceiver: IO error occurred!");
