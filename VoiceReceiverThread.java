@@ -57,9 +57,11 @@ public class VoiceReceiverThread implements Runnable
          receiving_socket.setSoTimeout(32);
          receiving_socket.receive(packet);
 
-         // Play data from the byte buffer
+         // Get data from the byte buffer
          byte[] byte_seq_num = Arrays.copyOfRange(buffer, 0, 8);
          byte[] block = Arrays.copyOfRange(buffer, 8, 520);
+         // Decrypt audio block
+         block = SecurityLayer.EncryptDecrypt(block);
          sequence_num = ByteBuffer.wrap(byte_seq_num).getInt();
          System.out.println("Received Packet: " + sequence_num);
 //         long start = System.currentTimeMillis();
