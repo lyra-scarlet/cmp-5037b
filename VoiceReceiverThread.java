@@ -48,21 +48,28 @@ public class VoiceReceiverThread implements Runnable
          throw new RuntimeException(e);
       }
       System.out.println("Receiving audio...");
-      int sequence_num;
+      long sequence_num;
       while (true) try {
          // Receive a DatagramPacket
          // **********************************************************************************
-         DatagramPacket packet = new DatagramPacket(buffer, 0, 520);
+         DatagramPacket packet = new DatagramPacket(buffer, 0, 524);
 
          receiving_socket.setSoTimeout(32);
          receiving_socket.receive(packet);
 
          // Get data from the byte buffer
          byte[] byte_seq_num = Arrays.copyOfRange(buffer, 0, 8);
-         byte[] block = Arrays.copyOfRange(buffer, 8, 520);
+         byte[] new_block = Arrays.copyOfRange(buffer, 8, 520);
+         byte[] checksum = Arrays.copyOfRange(buffer, 520, 524);
          // Decrypt audio block
-         block = SecurityLayer.EncryptDecrypt(block);
-         sequence_num = ByteBuffer.wrap(byte_seq_num).getInt();
+         SecurityLayer.EncryptDecrypt(new_block);
+         // Check checksum
+         byte[] checksum_data = ByteBuffer.wrap(new byte[520]).put(byte_seq_num).put(new_block).array();
+         if (!Arrays.equals(checksum, SecurityLayer.CalcChecksum(checksum_data)))
+            throw new SocketTimeoutException("Checksum mismatch");
+         // Play block
+         block = new_block;
+         sequence_num = ByteBuffer.wrap(byte_seq_num).getLong();
          System.out.println("Received Packet: " + sequence_num);
 //         long start = System.currentTimeMillis();
          player.playBlock(block);

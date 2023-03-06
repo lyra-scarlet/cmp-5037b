@@ -55,19 +55,21 @@ public class VoiceSenderThread implements Runnable{
 
       // Sequence Numbering
       // **********************************************************************************
-      int sequence_num = 0;
+      long sequence_num = 0;
       while (true) try {
          // Get a block from recorder
          byte[] block = recorder.getBlock();
-         // Encrypt audio block
-         block = SecurityLayer.EncryptDecrypt(block);
          // Convert the current sequence number into a byte array of size 8 and increment sequence number.
-         byte[] byte_seq_num = ByteBuffer.allocate(8).putInt(sequence_num++).array();
-         // Create the payload of size 520 in the format: [sequence number (8 bytes), and audio block (512 bytes)]
-         byte[] payload = new byte[byte_seq_num.length + block.length];
+         byte[] byte_seq_num = ByteBuffer.allocate(8).putLong(sequence_num++).array();
+         // Compute checksum from sequence number + unencrypted block
+         byte[] checksum_data = ByteBuffer.wrap(new byte[520]).put(byte_seq_num).put(block).array();
+         byte[] checksum = SecurityLayer.CalcChecksum(checksum_data);
+         // Encrypt audio block
+         SecurityLayer.EncryptDecrypt(block);
+         // Create the payload of size 524 in the format: [sequence number (8 bytes), audio block (512 bytes), checksum (4 bytes)]
+         byte[] payload = new byte[byte_seq_num.length + block.length + checksum.length];
          ByteBuffer buffer = ByteBuffer.wrap(payload);
-         buffer.put(byte_seq_num);
-         buffer.put(block);
+         buffer.put(byte_seq_num).put(block).put(checksum);
          payload = buffer.array();
 
          // Make a DatagramPacket from it, with client address and port number, then send it
