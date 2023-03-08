@@ -12,14 +12,8 @@ public class PlayerThread implements Runnable
    static Queue<byte[]> blockQueue = new LinkedList<>();
    static
    {
-      try
-      {
-         player = new AudioPlayer();
-      }
-      catch (LineUnavailableException e)
-      {
-         e.printStackTrace();
-      }
+      try { player = new AudioPlayer(); }
+      catch (LineUnavailableException e) { e.printStackTrace(); }
    }
 
    public void addToQueue(byte[] block) { blockQueue.add(block); }
@@ -38,14 +32,10 @@ public class PlayerThread implements Runnable
          {
             try
             {
-               block = blockQueue.poll();
-               player.playBlock(block);
+               player.playBlock(blockQueue.poll());
                Thread.sleep(5);
             }
-            catch (IOException | InterruptedException e)
-            {
-               e.printStackTrace();
-            }
+            catch (IOException | InterruptedException e) { e.printStackTrace(); }
          }
          else
          {
@@ -54,19 +44,13 @@ public class PlayerThread implements Runnable
                for (int i = 0; i < block.length; i++)
                {
                   if (block[i] < 0)
-                  {
                      block[i] *= -0.7;
-                  }
-                  else {
+                  else
                      block[i] *= 0.7;
-                  }
                }
                player.playBlock(block);
             }
-            catch (IOException e)
-            {
-               e.printStackTrace();
-            }
+            catch (IOException e) { e.printStackTrace(); }
          }
       }
    }

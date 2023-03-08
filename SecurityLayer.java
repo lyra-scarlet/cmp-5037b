@@ -18,6 +18,7 @@ public class SecurityLayer {
         for (int i = 0; i < data.length; i++) {
             data[i] ^= nextKeyByte();
         }
+        keyPosition = 0;
     }
 
     public static byte[] CalcChecksum(byte[] data) {
