@@ -11,12 +11,10 @@ public class SecurityLayer {
 
     private static byte nextKeyByte() {
         if (keyPosition >= key.length) keyPosition = 0;
-        byte temp = key[keyPosition];
-        keyPosition++;
-        return temp;
+        return key[keyPosition++];
     }
 
-    public static void EncryptDecrypt(byte[] data) {
+    public static synchronized void EncryptDecrypt(byte[] data) {
         for (int i = 0; i < data.length; i++) {
             data[i] ^= nextKeyByte();
         }
