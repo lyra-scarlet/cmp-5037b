@@ -1,8 +1,12 @@
 import uk.ac.uea.cmp.voip.*;
+
+import javax.swing.*;
 import java.net.*;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
+import java.util.HexFormat;
+
 public class VoiceReceiverThread implements Runnable
 {
    static DatagramSocket receiving_socket;
@@ -38,16 +42,24 @@ public class VoiceReceiverThread implements Runnable
       System.out.println("Receiving audio...");
 
       while (true) try {
-         byte[] buffer = new byte[520];
-         DatagramPacket packet = new DatagramPacket(buffer, 0, 520);
+         byte[] buffer = new byte[522];
+         DatagramPacket packet = new DatagramPacket(buffer, 0, 522);
 
 //         receiving_socket.setSoTimeout(32);
          receiving_socket.receive(packet);
 
-         byte[] byte_seq_num = Arrays.copyOfRange(buffer, 0, 8);
+         // Security checks
+         byte[] block = Arrays.copyOfRange(buffer, 8, 520);
+         if (Config.getBool("useDecryption")) SecurityLayer.EncryptDecrypt(block);
+         if (Config.getBool("useChecksum")) {
+            byte[] checksum = SecurityLayer.CalcChecksum(block);
+            byte[] rcvChecksum = Arrays.copyOfRange(buffer, 520, 522);
+            if (!Arrays.equals(checksum, rcvChecksum)) continue;
+         }
 
+         byte[] byte_seq_num = Arrays.copyOfRange(buffer, 0, 8);
          sequence_num = ByteBuffer.wrap(byte_seq_num).getInt();
-         playerThread.addToQueue(Arrays.copyOfRange(buffer, 8, 520));
+         playerThread.addToQueue(block);
          System.out.println("Received Packet: " + sequence_num);
       } catch (IOException e) {
          if (e instanceof SocketTimeoutException) {

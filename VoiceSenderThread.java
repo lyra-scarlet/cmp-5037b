@@ -55,11 +55,16 @@ public class VoiceSenderThread implements Runnable{
          byte[] block = recorder.getBlock();
          // Convert the current sequence number into a byte array of size 8 and increment sequence number.
          byte[] byte_seq_num = ByteBuffer.allocate(8).putInt(sequence_num++).array();
-         // Create the payload of size 520 in the format: [sequence number (8 bytes), and audio block (512 bytes)]
-         byte[] payload = new byte[byte_seq_num.length + block.length];
+         // Calculate checksum.
+         byte[] checksum = SecurityLayer.CalcChecksum(block);
+         // Encrypt audio block
+         if (Config.getBool("useEncryption")) SecurityLayer.EncryptDecrypt(block);
+         // Create the payload of size 522 in the format: [sequence number (8 bytes), audio block (512 bytes), checksum (2 bytes)]
+         byte[] payload = new byte[byte_seq_num.length + block.length + checksum.length];
          ByteBuffer buffer = ByteBuffer.wrap(payload);
          buffer.put(byte_seq_num);
          buffer.put(block);
+         buffer.put(checksum);
          payload = buffer.array();
          // Make a DatagramPacket from it, with client address and port number, then send it
          DatagramPacket packet = new DatagramPacket(payload, payload.length, clientIP, port);

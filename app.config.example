@@ -12,3 +12,8 @@ timeout=50
 
 # Encryption key (long)
 key=3669617439937964248
+
+# Enable/disable security features
+useEncryption=true
+useDecryption=true
+useChecksum=true

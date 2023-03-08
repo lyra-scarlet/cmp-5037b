@@ -25,6 +25,11 @@ public class Config {
         return prop.getProperty(property);
     }
 
+
+    public static boolean getBool(String property) {
+        return Boolean.parseBoolean(prop.getProperty(property));
+    }
+
     public static int getInt(String property) {
         return Integer.parseInt(prop.getProperty(property));
     }
