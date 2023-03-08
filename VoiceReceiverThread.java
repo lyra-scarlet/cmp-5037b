@@ -41,14 +41,13 @@ public class VoiceReceiverThread implements Runnable
          byte[] buffer = new byte[520];
          DatagramPacket packet = new DatagramPacket(buffer, 0, 520);
 
-         receiving_socket.setSoTimeout(32);
+//         receiving_socket.setSoTimeout(32);
          receiving_socket.receive(packet);
 
          byte[] byte_seq_num = Arrays.copyOfRange(buffer, 0, 8);
-         byte[] block = Arrays.copyOfRange(buffer, 8, 520);
 
          sequence_num = ByteBuffer.wrap(byte_seq_num).getInt();
-         playerThread.addToQueue(block);
+         playerThread.addToQueue(Arrays.copyOfRange(buffer, 8, 520));
          System.out.println("Received Packet: " + sequence_num);
       } catch (IOException e) {
          if (e instanceof SocketTimeoutException) {

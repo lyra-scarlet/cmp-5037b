@@ -8,6 +8,7 @@ import java.util.Queue;
 public class PlayerThread implements Runnable
 {
    static AudioPlayer player;
+   static byte[] block = new byte[512];
    static Queue<byte[]> blockQueue = new LinkedList<>();
    static
    {
@@ -37,9 +38,11 @@ public class PlayerThread implements Runnable
          {
             try
             {
-               player.playBlock(blockQueue.poll());
+               block = blockQueue.poll();
+               player.playBlock(block);
+               Thread.sleep(5);
             }
-            catch (IOException e)
+            catch (IOException | InterruptedException e)
             {
                e.printStackTrace();
             }
@@ -48,9 +51,19 @@ public class PlayerThread implements Runnable
          {
             try
             {
-               Thread.sleep(32);
+               for (int i = 0; i < block.length; i++)
+               {
+                  if (block[i] < 0)
+                  {
+                     block[i] *= -0.7;
+                  }
+                  else {
+                     block[i] *= 0.7;
+                  }
+               }
+               player.playBlock(block);
             }
-            catch (InterruptedException e)
+            catch (IOException e)
             {
                e.printStackTrace();
             }

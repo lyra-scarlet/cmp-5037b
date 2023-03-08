@@ -5,6 +5,7 @@ import java.util.Properties;
 import CMPC3M06.AudioRecorder;
 import uk.ac.uea.cmp.voip.DatagramSocket2;
 import javax.sound.sampled.LineUnavailableException;
+
 public class VoiceSenderThread implements Runnable{
    static DatagramSocket sending_socket;
    static InetAddress clientIP;
@@ -42,6 +43,7 @@ public class VoiceSenderThread implements Runnable{
       try {
          recorder = new AudioRecorder();
       } catch (LineUnavailableException e) {
+         System.err.println("ERROR!");
          throw new RuntimeException(e);
       }
       System.out.println("Sending audio...");
