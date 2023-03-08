@@ -11,7 +11,9 @@ public class SecurityLayer {
 
     private static byte nextKeyByte() {
         if (keyPosition >= key.length) keyPosition = 0;
-        return key[keyPosition++];
+        byte temp = key[keyPosition];
+        keyPosition++;
+        return temp;
     }
 
     public static void EncryptDecrypt(byte[] data) {
